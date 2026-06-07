@@ -1,14 +1,25 @@
+import os
 from flask import request
 from flask_jwt_extended import decode_token
 from flask_socketio import SocketIO, emit, join_room
 
 
-socketio = SocketIO(cors_allowed_origins=["http://localhost:5173"], supports_credentials=True)
 
+ALLOWED_ORIGINS = os.getenv(
+    "FRONTEND_ORIGINS",
+    "http://localhost:5173"
+).split(",")
+
+socketio = SocketIO(
+    cors_allowed_origins=ALLOWED_ORIGINS,
+    supports_credentials=True
+)
 
 def init_socketio(app):
-    socketio.init_app(app, cors_allowed_origins=["http://localhost:5173"])
-
+    socketio.init_app(
+        app,
+        cors_allowed_origins=ALLOWED_ORIGINS
+    )
 
 def _resolve_socket_identity():
     token = request.cookies.get("access_token_cookie")
