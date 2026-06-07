@@ -2,9 +2,9 @@ node_modules
 .env
 dist
 build
-Swapnil_Dhotre.pdf
+Swapnil_Dhotre_Resume.html
 tools
-paper_extraction.txt
+paper_extract.txt
 scripts
 docs
 .vscode
