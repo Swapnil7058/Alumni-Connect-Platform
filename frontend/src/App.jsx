@@ -4,10 +4,10 @@ import ProtectedRoute from "./component/ProtectedRoute";
 
 import Navbar from "./component/public_pages/shared/Navbar";
 
-import Home from "./component/public_pages/pages/home";
-import About from "./component/public_pages/pages/aboutus";
-import Contact from "./component/public_pages/pages/contactus";
-import Services from "./component/public_pages/pages/services";
+import Home from "./component/public_pages/pages/Home";
+import About from "./component/public_pages/pages/AboutUs";
+import Contact from "./component/public_pages/pages/ContactUs";
+import Services from "./component/public_pages/pages/Services";
 
 import Login from "./component/public_pages/auth_pages/Login";
 import AuthPage from "./component/public_pages/auth_pages/AuthPage";
