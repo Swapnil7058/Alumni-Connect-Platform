@@ -29,7 +29,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/profile/me", {
+        const response = await fetch("https://alumni-connect-platform-iiaa.onrender.com/api/profile/me", {
           method: "GET",
           credentials: "include",
         });
@@ -97,7 +97,7 @@ const EditProfile = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/profile/update", {
+      const response = await fetch("https://alumni-connect-platform-iiaa.onrender.com/api/profile/update", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(processedData),
