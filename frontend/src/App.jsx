@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./component/ProtectedRoute";
 
-import Navbar from "./component/public_pages/shared/navbar";
+import Navbar from "./component/public_pages/shared/Navbar";
 
 import Home from "./component/public_pages/pages/home";
 import About from "./component/public_pages/pages/aboutus";
@@ -36,7 +36,7 @@ import AdminDashboard from "./component/admin/AdminDashboard";
 function App() {
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      <Navbar/>
 
       <Routes>
         <Route path="/" element={<Home />} />
