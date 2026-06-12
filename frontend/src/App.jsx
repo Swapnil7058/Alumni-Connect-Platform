@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./component/ProtectedRoute";
 
@@ -16,29 +16,30 @@ import ForgotPassword from "./component/public_pages/auth_pages/ForgetPassword";
 import ResetPassword from "./component/public_pages/auth_pages/ResetPassword";
 import EditProfile from "./component/public_pages/auth_pages/EditProfile";
 
-import Forum from "./component/public_pages/services/Forum";
-import ResumeBuilder from "./component/public_pages/services/ResumeBuilder";
-import ArticleWriter from "./component/public_pages/services/ArticleWriter";
-import Assistant from "./component/public_pages/services/Assistant";
+const Forum = lazy(() => import("./component/public_pages/services/Forum"));
+const ResumeBuilder = lazy(() => import("./component/public_pages/services/ResumeBuilder"));
+const ArticleWriter = lazy(() => import("./component/public_pages/services/ArticleWriter"));
+const Assistant = lazy(() => import("./component/public_pages/services/Assistant"));
 
-import StudentDashboard from "./component/student/StudentDashboard";
-import MentorshipMatching from "./component/student/MentorshipMatching";
-import ConversationHub from "./component/shared/ConversationHub";
+const StudentDashboard = lazy(() => import("./component/student/StudentDashboard"));
+const MentorshipMatching = lazy(() => import("./component/student/MentorshipMatching"));
+const ConversationHub = lazy(() => import("./component/shared/ConversationHub"));
 
-import AlumniDashboard from "./component/alumini/AlumniDashboard";
-import JobPortal from "./component/alumini/AlumniJobPortal";
-import Communication from "./component/alumini/alumni_components/alumniCommunication/AluminiCommunication";
-import AlumniProfile from "./component/alumini/alumni_components/alumniProfile/AlumniProfile";
-import StudentProfilesPage from "./component/alumini/alumni_components/studentCart/StudentProfilesPage";
+const AlumniDashboard = lazy(() => import("./component/alumini/AlumniDashboard"));
+const JobPortal = lazy(() => import("./component/alumini/AlumniJobPortal"));
+const Communication = lazy(() => import("./component/alumini/alumni_components/alumniCommunication/AluminiCommunication.jsx"));
+const AlumniProfile = lazy(() => import("./component/alumini/alumni_components/alumniProfile/AlumniProfile"));
+const StudentProfilesPage = lazy(() => import("./component/alumini/alumni_components/studentCart/StudentProfilesPage"));
 
-import AdminDashboard from "./component/admin/AdminDashboard";
+const AdminDashboard = lazy(() => import("./component/admin/AdminDashboard"));
 
 function App() {
   return (
     <div className="min-h-screen bg-white">
-      <Navbar/>
+      <Navbar />
 
-      <Routes>
+      <Suspense fallback={<div className="p-8 text-center text-slate-600">Loading page…</div>}>
+        <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -222,6 +223,7 @@ function App() {
 
         <Route path="*" element={<Home />} />
       </Routes>
+      </Suspense>
     </div>
   );
 }

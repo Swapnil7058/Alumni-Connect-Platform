@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, UserCheck, MessageSquare, Briefcase, Sparkles } from "lucide-react";
@@ -16,44 +16,54 @@ const MentorshipMatching = () => {
   const [error, setError] = useState("");
   const [aiProvider, setAiProvider] = useState("local-fallback");
 
-  const fetchMentors = async (interest = areaOfInterest) => {
-    try {
-      setLoading(true);
-      const response = await getMentorRecommendations(interest);
-      setMentors(response.recommendations || []);
-      setAiProvider(response.aiProvider || "local-fallback");
-      setError("");
-    } catch (err) {
-      setError(err.message);
-      setMentors([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchMentors = useCallback(
+    async (interest) => {
+      const queryInterest = interest ?? areaOfInterest;
+      try {
+        setLoading(true);
+        const response = await getMentorRecommendations(queryInterest);
+        setMentors(response.recommendations || []);
+        setAiProvider(response.aiProvider || "local-fallback");
+        setError("");
+      } catch (err) {
+        setError(err.message);
+        setMentors([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [areaOfInterest]
+  );
 
   useEffect(() => {
     fetchMentors("");
-  }, []);
+  }, [fetchMentors]);
 
-  const handleRequestMentor = async (mentorId) => {
-    try {
-      setRequestingId(mentorId);
-      const response = await requestMentor(mentorId);
-      navigate("/student/conversations", {
-        state: { conversationId: response.conversation?._id },
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setRequestingId("");
-    }
-  };
-
-  const filteredMentors = mentors.filter((mentor) =>
-    `${mentor.name} ${mentor.company} ${mentor.match_reason || ""}`
-      .toLowerCase()
-      .includes(filter.toLowerCase())
+  const handleRequestMentor = useCallback(
+    async (mentorId) => {
+      try {
+        setRequestingId(mentorId);
+        const response = await requestMentor(mentorId);
+        navigate("/student/conversations", {
+          state: { conversationId: response.conversation?._id },
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setRequestingId("");
+      }
+    },
+    [navigate]
   );
+
+  const filteredMentors = useMemo(() => {
+    const filterQuery = filter.toLowerCase();
+    return mentors.filter((mentor) =>
+      `${mentor.name} ${mentor.company} ${mentor.match_reason || ""}`
+        .toLowerCase()
+        .includes(filterQuery)
+    );
+  }, [filter, mentors]);
 
   return (
     <div className="bg-slate-50 min-h-screen">
