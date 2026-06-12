@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Briefcase,
@@ -65,7 +65,7 @@ const RoleSidebar = ({ role }) => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  const config = sidebarConfig[role];
+  const config = useMemo(() => sidebarConfig[role], [role]);
   if (!config) {
     return null;
   }
@@ -148,4 +148,4 @@ const RoleSidebar = ({ role }) => {
   );
 };
 
-export default RoleSidebar;
+export default React.memo(RoleSidebar);

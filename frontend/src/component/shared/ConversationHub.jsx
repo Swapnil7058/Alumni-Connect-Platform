@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MoreVertical, Phone, Search, Send, User, Video } from "lucide-react";
@@ -147,17 +147,34 @@ export default function ConversationHub() {
     };
   }, [selectedConversationId]);
 
-  const filteredConversations = conversations.filter((conversation) => {
-    const otherParticipant =
-      conversation.participants?.find((participant) => participant.email !== user?.email) ||
-      conversation.participants?.[0];
+  const filteredConversations = useMemo(() => {
+    const query = search.toLowerCase();
+    return conversations.filter((conversation) => {
+      const otherParticipant =
+        conversation.participants?.find((participant) => participant.email !== user?.email) ||
+        conversation.participants?.[0];
 
-    return `${otherParticipant?.name || ""} ${conversation.last_message || ""}`
-      .toLowerCase()
-      .includes(search.toLowerCase());
-  });
+      return `${otherParticipant?.name || ""} ${conversation.last_message || ""}`
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [conversations, search, user?.email]);
 
-  const handleSend = async () => {
+  const selectedConversationOtherParticipant = useMemo(
+    () =>
+      selectedConversation?.participants?.find((participant) => participant.email !== user?.email) ||
+      selectedConversation?.participants?.[0] ||
+      null,
+    [selectedConversation, user?.email]
+  );
+
+  const sidebarRole = useMemo(() => (user?.role === "alumni" ? "alumni" : "student"), [user?.role]);
+  const roleHome = useMemo(
+    () => (user?.role === "alumni" ? "/alumni/dashboard" : "/student/dashboard"),
+    [user?.role]
+  );
+
+  const handleSend = useCallback(async () => {
     if (!selectedConversationId || !message.trim() || sending) {
       return;
     }
@@ -171,10 +188,15 @@ export default function ConversationHub() {
     } finally {
       setSending(false);
     }
-  };
+  }, [selectedConversationId, message, sending]);
 
-  const sidebarRole = user?.role === "alumni" ? "alumni" : "student";
-  const roleHome = user?.role === "alumni" ? "/alumni/dashboard" : "/student/dashboard";
+  const handleSelectConversation = useCallback(
+    (conversationId) => {
+      setSelectedConversationId(conversationId);
+      navigate(location.pathname, { replace: true, state: { conversationId } });
+    },
+    [location.pathname, navigate]
+  );
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -230,10 +252,7 @@ export default function ConversationHub() {
                     <motion.button
                       key={conversation._id}
                       whileHover={{ scale: 1.01 }}
-                      onClick={() => {
-                        setSelectedConversationId(conversation._id);
-                        navigate(location.pathname, { replace: true, state: { conversationId: conversation._id } });
-                      }}
+                      onClick={() => handleSelectConversation(conversation._id)}
                       className={`w-full text-left p-4 border-b border-slate-100 transition-colors ${
                         selectedConversationId === conversation._id ? "bg-red-50" : "hover:bg-slate-50"
                       }`}
@@ -269,7 +288,7 @@ export default function ConversationHub() {
                     </div>
                     <div>
                       <h2 className="font-bold text-slate-900">
-                        {selectedConversation.participants?.find((participant) => participant.email !== user?.email)?.name || "Mentorship chat"}
+                        {selectedConversationOtherParticipant?.name || "Mentorship chat"}
                       </h2>
                       <p className="text-xs text-slate-500">
                         Moderation: {selectedConversation.moderation_status || "active"}

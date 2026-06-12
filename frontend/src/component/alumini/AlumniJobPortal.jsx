@@ -70,8 +70,8 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
     config_error: "",
   });
 
-  const canPost = ["alumni", "admin", "college"].includes(userRole);
-  const canManageLinkedIn = userRole === "admin";
+  const canPost = useMemo(() => ["alumni", "admin", "college"].includes(userRole), [userRole]);
+  const canManageLinkedIn = useMemo(() => userRole === "admin", [userRole]);
   const linkedinQueryStatus = searchParams.get("linkedin");
   const linkedinQueryMessage = searchParams.get("message");
 
@@ -135,7 +135,10 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
     return () => window.removeEventListener("focus", handleWindowFocus);
   }, [pendingApplicationJob]);
 
-  const visibleJobs = activeBoard === "linkedin" ? linkedInJobs : jobs;
+  const visibleJobs = useMemo(
+    () => (activeBoard === "linkedin" ? linkedInJobs : jobs),
+    [activeBoard, linkedInJobs, jobs]
+  );
 
   const filteredJobs = useMemo(() => {
     return visibleJobs.filter((job) =>
@@ -145,7 +148,7 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
     );
   }, [searchQuery, visibleJobs]);
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
     await createJob({
       ...form,
       tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
@@ -154,41 +157,44 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
     setIsPosting(false);
     setActiveBoard(form.published_to_linkedin || form.source === "linkedin" ? "linkedin" : "all");
     loadJobs();
-  };
+  }, [form, loadJobs]);
 
-  const handleLinkedInPost = async (job) => {
-    if (linkedinStatus.config_error) {
-      alert(`LinkedIn configuration issue: ${linkedinStatus.config_error}`);
-      return;
-    }
-
-    if (!linkedinStatus.connected) {
-      if (canManageLinkedIn) {
-        const shouldConnect = window.confirm(
-          "The organization LinkedIn account is not connected yet. Do you want to connect it now?"
-        );
-        if (shouldConnect) {
-          connectOrganizationLinkedIn();
-        }
-      } else {
-        alert("The organization LinkedIn account is not connected yet. Please ask an admin to connect it first.");
+  const handleLinkedInPost = useCallback(
+    async (job) => {
+      if (linkedinStatus.config_error) {
+        alert(`LinkedIn configuration issue: ${linkedinStatus.config_error}`);
+        return;
       }
-      return;
-    }
 
-    try {
-      setPublishingLinkedInJobId(job._id);
-      await publishJobToLinkedIn(job._id);
-      await loadJobs();
-      await loadLinkedInStatus();
-    } catch (error) {
-      alert(error.message || "Unable to publish this job to LinkedIn.");
-    } finally {
-      setPublishingLinkedInJobId("");
-    }
-  };
+      if (!linkedinStatus.connected) {
+        if (canManageLinkedIn) {
+          const shouldConnect = window.confirm(
+            "The organization LinkedIn account is not connected yet. Do you want to connect it now?"
+          );
+          if (shouldConnect) {
+            connectOrganizationLinkedIn();
+          }
+        } else {
+          alert("The organization LinkedIn account is not connected yet. Please ask an admin to connect it first.");
+        }
+        return;
+      }
 
-  const handleDeleteJob = async (job) => {
+      try {
+        setPublishingLinkedInJobId(job._id);
+        await publishJobToLinkedIn(job._id);
+        await loadJobs();
+        await loadLinkedInStatus();
+      } catch (error) {
+        alert(error.message || "Unable to publish this job to LinkedIn.");
+      } finally {
+        setPublishingLinkedInJobId("");
+      }
+    },
+    [canManageLinkedIn, linkedinStatus.config_error, linkedinStatus.connected, loadJobs, loadLinkedInStatus]
+  );
+
+  const handleDeleteJob = useCallback(async (job) => {
     const shouldDelete = window.confirm(
       `Delete "${job.title}" at ${job.company}? This will also remove its saved applications.`
     );
@@ -206,9 +212,9 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
     } finally {
       setDeletingJobId("");
     }
-  };
+  }, [loadJobs]);
 
-  const handleApply = (job) => {
+  const handleApply = useCallback((job) => {
     const applicationUrl = job.link || job.linkedin_post_url;
 
     if (!applicationUrl) {
@@ -224,33 +230,36 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
     }
 
     setPendingApplicationJob(job);
-  };
+  }, []);
 
-  const handleApplicationConfirmation = async (didApply) => {
-    const confirmApplicationJob = jobs
-      .concat(linkedInJobs)
-      .find((job) => job._id === confirmApplicationJobId);
+  const allJobs = useMemo(() => [...jobs, ...linkedInJobs], [jobs, linkedInJobs]);
 
-    if (!confirmApplicationJob) {
-      return;
-    }
+  const handleApplicationConfirmation = useCallback(
+    async (didApply) => {
+      const confirmApplicationJob = allJobs.find((job) => job._id === confirmApplicationJobId);
 
-    if (!didApply) {
-      setConfirmApplicationJobId("");
-      return;
-    }
+      if (!confirmApplicationJob) {
+        return;
+      }
 
-    try {
-      setIsSubmittingApplication(true);
-      await applyToJob(confirmApplicationJob._id);
-      await loadJobs();
-      setConfirmApplicationJobId("");
-    } catch (error) {
-      alert(error.message || "Unable to save the application status.");
-    } finally {
-      setIsSubmittingApplication(false);
-    }
-  };
+      if (!didApply) {
+        setConfirmApplicationJobId("");
+        return;
+      }
+
+      try {
+        setIsSubmittingApplication(true);
+        await applyToJob(confirmApplicationJob._id);
+        await loadJobs();
+        setConfirmApplicationJobId("");
+      } catch (error) {
+        alert(error.message || "Unable to save the application status.");
+      } finally {
+        setIsSubmittingApplication(false);
+      }
+    },
+    [allJobs, confirmApplicationJobId, loadJobs]
+  );
 
   return (
     <div className="bg-slate-50 min-h-screen">
