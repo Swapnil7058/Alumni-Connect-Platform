@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, MapPin, Briefcase, Filter, ExternalLink, Bookmark } from "lucide-react";
+import { Search, MapPin, Briefcase, Filter, ExternalLink, Bookmark, Handshake, MessageSquare, GraduationCap, User, Menu, X } from "lucide-react";
 
 const StudentJobPortal = () => {
   const [activeSection, setActiveSection] = useState("jobPortal");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Simulated data: Alumni-posted (Internal) and Scraped (External) [cite: 195]
   // const jobs = [
@@ -42,9 +43,37 @@ const StudentJobPortal = () => {
   // ];
 
   return (
-    <div className="flex bg-[#f1f5f9] min-h-screen">
+    <div className="relative flex bg-[#f1f5f9] min-h-screen">
+      <button
+        className="md:hidden fixed top-24 left-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-2xl transition hover:bg-slate-800"
+        onClick={() => setIsSidebarOpen(true)}
+        aria-label="Open menu"
+      >
+        <Menu size={20} />
+      </button>
+      <div
+        className={`fixed inset-0 z-40 bg-slate-950/60 transition-opacity duration-300 md:hidden ${
+          isSidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsSidebarOpen(false)}
+      />
       {/* Sidebar */}
-      <aside className="w-64 bg-gradient-to-b from-[#1e3a8a] to-[#1e40af] text-white fixed h-screen flex flex-col shadow-xl">
+      <aside className={`fixed top-20 left-0 z-50 h-[calc(100vh-5rem)] w-64 flex-col bg-gradient-to-b from-[#1e3a8a] to-[#1e40af] text-white shadow-xl transition-transform duration-300 md:flex ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}>
+        <div className="flex items-center justify-between p-6 font-bold text-xl border-b border-blue-800 gap-3">
+          <div className="bg-white p-2 rounded-lg shadow">
+            <Handshake size={20} className="text-blue-800" />
+          </div>
+          <span>ALUMNI CONNECT</span>
+          <button
+            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
+        </div>
         <div className="p-6 font-bold text-xl border-b border-blue-800 flex items-center gap-3">
           <div className="bg-white p-2 rounded-lg shadow">
             <Handshake size={20} className="text-blue-800" />
@@ -101,7 +130,7 @@ const StudentJobPortal = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-64">
+      <main className="flex-1 md:ml-64">
         {activeSection === "jobPortal" && <AlumniDashboard />}
 
         {activeSection === "profile" && (

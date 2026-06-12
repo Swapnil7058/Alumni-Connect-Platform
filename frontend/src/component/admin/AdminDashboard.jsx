@@ -71,7 +71,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <RoleSidebar role="admin" />
-      <div className="ml-64 p-10 pt-28 space-y-10">
+      <div className="md:ml-64 ml-0 p-10 pt-28 space-y-10">
       <div>
         <h1 className="text-3xl font-bold text-red-600">Admin Dashboard</h1>
         <p className="text-slate-500 mt-2">

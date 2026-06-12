@@ -255,7 +255,7 @@ const JobPortalPage = ({ userRole = "alumni", initialBoard = "all" }) => {
   return (
     <div className="bg-slate-50 min-h-screen">
       <RoleSidebar role={userRole} />
-      <div className="ml-64 pt-28 pb-16 px-6">
+      <div className="md:ml-64 ml-0 pt-28 pb-16 px-6">
       <div className="max-w-7xl mx-auto">
         {linkedinQueryStatus ? (
           <div

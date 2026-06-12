@@ -179,7 +179,7 @@ export default function ConversationHub() {
   return (
     <div className="min-h-screen bg-slate-100">
       <RoleSidebar role={sidebarRole} />
-      <div className="ml-64 pt-24 pb-8 px-4 md:px-6">
+      <div className="md:ml-64 ml-0 pt-24 pb-8 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6 gap-4">
           <div>

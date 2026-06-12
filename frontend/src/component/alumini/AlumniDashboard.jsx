@@ -133,8 +133,8 @@ export default function AlumniDashboard() {
     <div className="flex bg-[#f1f5f9] min-h-screen">
       <RoleSidebar role="alumni" />
 
-      {/* Main Content (IMPORTANT: ml-64 to avoid sidebar overlap) */}
-      <div className="flex-1 ml-64 p-8 mt-20">
+      {/* Main Content (IMPORTANT: md:ml-64 to avoid sidebar overlap on larger screens) */}
+      <div className="flex-1 md:ml-64 ml-0 p-8 mt-20">
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, i) => {

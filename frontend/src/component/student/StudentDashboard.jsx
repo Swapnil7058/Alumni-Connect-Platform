@@ -16,7 +16,7 @@ const StudentDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <RoleSidebar role="student" />
-      <div className="ml-64 pt-32 pb-20 px-6">
+      <div className="md:ml-64 ml-0 pt-32 pb-20 px-6">
       <div className="max-w-7xl mx-auto">
         <header className="mb-12">
           <h1 className="text-3xl font-extrabold text-slate-900">Student Dashboard</h1>
